@@ -1,0 +1,15 @@
+privilegeTargets:
+
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+
+    'Visol.PaperTiger.ZebraAdaptor:FormApiController':
+      matcher: >
+        method(Visol\PaperTiger\ZebraAdaptor\Controller\FormApiController->.*Action())
+
+roles:
+
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Visol.PaperTiger.ZebraAdaptor:FormApiController'
+        permission: GRANT

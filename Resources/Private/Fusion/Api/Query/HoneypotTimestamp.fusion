@@ -1,0 +1,14 @@
+# Query to generate a fresh timestampWithHmac for honeypot fields.
+# This is fetched separately from the document data so it can have its own cache lifecycle
+# (revalidated every 12 hours), ensuring the timestamp stays within the 24-hour validity window.
+# Example: <neos-base-uri>/neos/content-api/query/honeypot-timestamp
+contentApi {
+  queries {
+    honeypot-timestamp = Neos.Fusion:DataStructure {
+      meta = Neos.Fusion:DataStructure
+      data = Neos.Fusion:DataStructure {
+        timestampWithHmac = ${PaperTiger.timestampWithHmac()}
+      }
+    }
+  }
+}

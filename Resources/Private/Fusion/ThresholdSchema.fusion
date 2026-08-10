@@ -1,0 +1,35 @@
+# Emits the client-side validation thresholds consumed by the frontend form renderer.
+# Included in the content API payload via Api/Content/Form.fusion.
+prototype(Visol.PaperTiger.ZebraAdaptor:ThresholdSchema) < prototype(Neos.Fusion:Component) {
+    formIdentifier = ''
+    fields = null
+
+    @context {
+        // Field types registered under Visol.PaperTiger.ZebraAdaptor.fieldTypes.
+        // Domain packages extend these lists in their own Settings.yaml rather
+        // than this package knowing about them.
+
+        // don't add any threshold configuration for these field types
+        omitNamedFields = ${Array.concat(Array.values(Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.omitted')), Array.values(Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.omittedFromThreshold')))}
+    }
+
+    renderer = Neos.Fusion:Map {
+        // Ignore fields contained in omitNamedFields and fields without name (e.g. Honeypot
+        items = ${Array.filter(props.fields, item => (item.properties.name && Array.indexOf(omitNamedFields, item.nodeType.name) == -1))}
+        itemName = 'field'
+
+        keyRenderer = ${props.formIdentifier + '[' + field.properties.name + ']'}
+
+        itemRenderer = Neos.Fusion:Case {
+            email {
+                // validation after having typed N characters, if trigger is 'keyup'
+                condition = ${field.nodeType.name == 'Sitegeist.PaperTiger:Field.Email'}
+                renderer = 0
+            }
+            default {
+                condition = ${true}
+                renderer = 0
+            }
+        }
+    }
+}

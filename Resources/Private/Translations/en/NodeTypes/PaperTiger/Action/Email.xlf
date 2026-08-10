@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="en">
+    <body>
+      <trans-unit id="form.followUpActions.message.empty" xml:space="preserve">
+        <source>The form will not be sent. No form action has been added yet.</source>
+        <target>The form will not be sent. No form action has been added yet.</target>
+      </trans-unit>
+      <trans-unit id="properties.subject" xml:space="preserve">
+        <source>Subject</source>
+        <target>Subject</target>
+      </trans-unit>
+      <trans-unit id="properties.html" xml:space="preserve">
+        <source>E-mail content</source>
+        <target>E-mail content</target>
+      </trans-unit>
+      <trans-unit id="properties.recipient" xml:space="preserve">
+        <source>Recipient</source>
+        <target>Recipient</target>
+      </trans-unit>
+      <trans-unit id="properties.sender" xml:space="preserve">
+        <source>Sender</source>
+        <target>Sender</target>
+      </trans-unit>
+      <trans-unit id="properties.recipientAddress.help" xml:space="preserve">
+        <source>Placeholders can be used, e.g. "{email}".</source>
+        <target>Placeholders can be used, e.g. "{email}".</target>
+      </trans-unit>
+      <trans-unit id="properties.namePlaceholders.help" xml:space="preserve">
+        <source>Placeholders can be used, e.g. "{firstName} {lastName}".</source>
+        <target>Placeholders can be used, e.g. "{firstName} {lastName}".</target>
+      </trans-unit>
+      <trans-unit id="properties.replyToAddress.help" xml:space="preserve">
+        <source>Used when somebody replies to the e-mail. Placeholders can be used, e.g. "{email}".</source>
+        <target>Used when somebody replies to the e-mail. Placeholders can be used, e.g. "{email}".</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

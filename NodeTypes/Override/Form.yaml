@@ -1,0 +1,20 @@
+'Sitegeist.PaperTiger:Form':
+  label: "${(q(node).property('name') ? q(node).property('name') : Translation.translate('ui.label', 'Form', [], 'NodeTypes/PaperTiger/Form', 'Visol.PaperTiger.ZebraAdaptor'))}"
+  superTypes:
+    'Neos.Neos:Content': true
+  ui:
+    label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Form:ui.label'
+    group: specialContent
+    position: 80
+  properties:
+    name:
+      type: string
+      ui:
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Form:properties.name.label'
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Form:properties.name.help'
+        reloadIfChanged: true
+        showInCreationDialog: true
+        inspector:
+          position: 'end'
+          group: form

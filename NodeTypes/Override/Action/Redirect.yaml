@@ -1,0 +1,21 @@
+Sitegeist.PaperTiger:Action.Redirect:
+  superTypes:
+    'Sitegeist.PaperTiger:Action': true
+  properties:
+    uri:
+      ui:
+        showInCreationDialog: true
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': []
+    name:
+      type: string
+      ui:
+        showInCreationDialog: true
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.Redirect:properties.name.label'
+        reloadIfChanged: true
+        inspector:
+          group: 'form'
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.Redirect:properties.name.help'
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': []

@@ -1,0 +1,4 @@
+Neos:
+  Fusion:
+    defaultContext:
+      Visol.PaperTiger.ZebraAdaptor: Visol\PaperTiger\ZebraAdaptor\Eel\Helper\FormHelper

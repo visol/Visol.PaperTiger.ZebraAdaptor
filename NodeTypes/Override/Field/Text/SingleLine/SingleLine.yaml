@@ -1,0 +1,7 @@
+# Disable regularExpression property. If enabled in the future, don't forget to adjust Visol.PaperTiger.ZebraAdaptor:ValidationSchema
+Sitegeist.PaperTiger:Field.Text.SingleLine:
+  properties:
+    regularExpression:
+      ui:
+        inspector:
+          group: ~

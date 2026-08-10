@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="de">
+    <body>
+      <trans-unit id="ui.label" xml:space="preserve">
+        <source>Database storage</source>
+        <target>Speichern</target>
+	  </trans-unit>
+      <trans-unit id="properties.formIdentifier.ui.label" xml:space="preserve">
+        <source>Database storage ID</source>
+        <target>Datenbank-Speicher-ID</target>
+	  </trans-unit>
+      <trans-unit id="properties.formIdentifier.ui.help.message" xml:space="preserve">
+        <source>Is used as key in the 'DatabaseStorage' module.</source>
+        <target>Wird als Schlüssel zum Speichern im Modul 'Datenbank-Speicher' verwendet.</target>
+	  </trans-unit>
+      <trans-unit id="properties.formIdentifier.validation.errorMessage" xml:space="preserve">
+        <source>The ID may only contain letter, integers and dashes</source>
+        <target>Die ID darf nur aus Buchstaben, Zahlen und Bindestrichen bestehen.</target>
+	  </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,8 @@
+# Standalone analysis of this package. Inside the ABL monorepo the package is
+# covered by neos-next/neos/phpstan.neon, which analyses all DistributionPackages.
+parameters:
+  level: 8
+  paths:
+    - Classes
+  bootstrapFiles:
+    - vendor/autoload.php

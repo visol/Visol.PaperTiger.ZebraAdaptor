@@ -1,0 +1,82 @@
+# Backend-only: renders the per-action preview inside the action collection.
+prototype(Sitegeist.PaperTiger:ActionCollection.Preview) < prototype(Neos.Neos:ContentCollection) {
+    nodePath = null
+    prototype(Neos.Neos:ContentCollectionRenderer) {
+        itemRenderer = Sitegeist.PaperTiger:ActionCollection.Preview.ContentCase
+    }
+}
+
+prototype(Sitegeist.PaperTiger:ActionCollection.Preview.ContentCase) < prototype(Neos.Neos:ContentComponent) {
+    label = ${node.label}
+    type = ${node.nodeType.name}
+
+    preview = Neos.Fusion:Case {
+        default {
+            @position = 'end'
+            condition = true
+            type = ${node.nodeType.name + '.Preview'}
+        }
+    }
+
+    @context.translationPackage = 'Sitegeist.PaperTiger'
+
+    // todo: set locale according selecte be-language?
+
+    label = Neos.Fusion:Case {
+        Email {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Email'}
+            renderer = ${Translation.translate('ui.label', 'null', [], 'NodeTypes.Action.Email', translationPackage)}
+        }
+        Message {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Message'}
+            renderer = ${Translation.translate('ui.label', 'null', [], 'NodeTypes.Action.Message', translationPackage)}
+        }
+        Redirect {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Redirect'}
+            renderer = ${Translation.translate('ui.label', 'null', [], 'NodeTypes.Action.Redirect', translationPackage)}
+        }
+        DatabaseStorage {
+            condition = ${node.nodeType.name == 'Visol.PaperTiger.ZebraAdaptor:Action.DatabaseStorage'}
+            renderer = ${Translation.translate('ui.label', 'Speicher', [], 'NodeTypes.PaperTiger.Action.DatabaseStorage', 'Visol.PaperTiger.ZebraAdaptor')}
+        }
+        default {
+            @position = 'end'
+            condition = true
+            renderer = ''
+        }
+    }
+
+    iconSvg = Neos.Fusion:Case {
+        Email {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Email'}
+            renderer = '<svg aria-hidden="true" focusable="false" class="neos-svg-inline--fa neos-fa-envelope fa-w-16 fa-sm far fa-envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="Send email"><path fill="currentColor" d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm0 48v40.805c-22.422 18.259-58.168 46.651-134.587 106.49-16.841 13.247-50.201 45.072-73.413 44.701-23.208.375-56.579-31.459-73.413-44.701C106.18 199.465 70.425 171.067 48 152.805V112h416zM48 400V214.398c22.914 18.251 55.409 43.862 104.938 82.646 21.857 17.205 60.134 55.186 103.062 54.955 42.717.231 80.509-37.199 103.053-54.947 49.528-38.783 82.032-64.401 104.947-82.653V400H48z"></path></svg>'
+        }
+        Message {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Message'}
+            renderer = '<svg aria-hidden="true" focusable="false" class="neos-svg-inline--fa neos-fa-comment fa-w-16 fa-sm fas fa-comment" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="Show message"><path fill="currentColor" d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"></path></svg>'
+        }
+        Redirect {
+            condition = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Redirect'}
+            renderer = '<svg aria-hidden="true" focusable="false" class="neos-svg-inline--fa neos-fa-arrow-right fa-w-14 fa-sm fas fa-arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" aria-label="Redirect user"><path fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path></svg>'
+        }
+        DatabaseStorage {
+            condition = ${node.nodeType.name == 'Visol.PaperTiger.ZebraAdaptor:Action.DatabaseStorage'}
+            renderer = '<svg aria-hidden="true" focusable="false" class="neos-svg-inline--fa neos-fa-database fa-w-14 fa-sm fas fa-database" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" aria-label="Datenbank-Speicher"><path fill="currentColor" d="M448 73.143v45.714C448 159.143 347.667 192 224 192S0 159.143 0 118.857V73.143C0 32.857 100.333 0 224 0s224 32.857 224 73.143zM448 176v102.857C448 319.143 347.667 352 224 352S0 319.143 0 278.857V176c48.125 33.143 136.208 48.572 224 48.572S399.874 209.143 448 176zm0 160v102.857C448 479.143 347.667 512 224 512S0 479.143 0 438.857V336c48.125 33.143 136.208 48.572 224 48.572S399.874 369.143 448 336z"></path></svg>'
+        }
+        default {
+            @position = 'end'
+            condition = true
+            renderer = ''
+        }
+    }
+
+    renderer >
+    renderer = afx`
+        <div class="papertiger-action-collection">
+            <h2 class="papertiger-actioncollection__label">
+                {props.iconSvg} {props.label}
+            </h2>
+            <div @if={props.preview} class="papertiger-actioncollection__preview">{props.preview}</div>
+        </div>
+    `
+}

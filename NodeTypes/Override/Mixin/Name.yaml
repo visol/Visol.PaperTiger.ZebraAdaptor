@@ -1,0 +1,7 @@
+Sitegeist.PaperTiger:Mixin.Name:
+  properties:
+    name:
+      ui:
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Mixin.Name:properties.name'
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Mixin.Name:properties.name.ui.help.message'

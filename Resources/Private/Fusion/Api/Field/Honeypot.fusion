@@ -1,0 +1,6 @@
+# Extend BaseNode to include timestampWithHmac for honeypot field nodes.
+# This makes the server-generated signed timestamp available in the content API node data.
+prototype(Networkteam.Neos.ContentApi:BaseNode) {
+  timestampWithHmac = ${PaperTiger.timestampWithHmac()}
+  timestampWithHmac.@if.isHoneypotField = ${node.nodeType.name == 'Sitegeist.PaperTiger:Field.Honeypot'}
+}

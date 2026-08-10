@@ -1,0 +1,29 @@
+-
+  name: 'Submit form'
+  uriPattern: 'api/form/submit'
+  defaults:
+    '@package': 'Visol.PaperTiger.ZebraAdaptor'
+    '@controller': 'FormApi'
+    '@action': 'submit'
+  httpMethods: ['POST']
+  appendExceedingArguments: true
+
+-
+  name: 'Upload file'
+  uriPattern: 'api/form/upload'
+  defaults:
+    '@package': 'Visol.PaperTiger.ZebraAdaptor'
+    '@controller': 'FormApi'
+    '@action': 'upload'
+  httpMethods: ['POST']
+  appendExceedingArguments: true
+
+-
+  name: 'Cancel uploaded file'
+  uriPattern: 'api/form/upload-cancel'
+  defaults:
+    '@package': 'Visol.PaperTiger.ZebraAdaptor'
+    '@controller': 'FormApi'
+    '@action': 'cancelUpload'
+  httpMethods: ['POST']
+  appendExceedingArguments: true

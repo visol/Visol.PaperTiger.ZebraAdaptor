@@ -1,0 +1,128 @@
+# Emits the client-side validation rules consumed by the frontend form renderer.
+# Included in the content API payload via Api/Content/Form.fusion.
+prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusion:Component) {
+    formIdentifier = ''
+    fields = null
+
+    @context {
+        // Field types registered under Visol.PaperTiger.ZebraAdaptor.fieldTypes.
+        // Domain packages extend these lists in their own Settings.yaml rather
+        // than this package knowing about them.
+
+        // don't add any validator configuration for these field types
+        omitNamedFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.omitted')}
+        // Only genuine checkbox groups are multi-value; radio buttons and the single
+        // privacy-confirmation checkbox store a scalar and submit without the [] suffix.
+        multiValueFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.multiValue')}
+        // field types that get the emailAddress validator
+        emailFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.email')}
+        // field types per "required field is empty" message category
+        selectOptionFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.selectOption')}
+        selectAtLeastOneOptionFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.selectAtLeastOneOption')}
+        acceptRequiredFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.acceptRequired')}
+        selectFileFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.selectFile')}
+    }
+
+    renderer = Neos.Fusion:Map {
+        // Ignore fields contained in omitNamedFields and fields without name (e.g. Honeypot)
+        items = ${Array.filter(props.fields, item => (item.properties.name && Array.indexOf(omitNamedFields, item.nodeType.name) == -1))}
+        itemName = 'field'
+
+        // Example: 8e9b6f27-6f5d-445a-8021-305b98865f17[email] - must match "name" attribute of field
+        keyRenderer = ${props.formIdentifier + '[' + field.properties.name + ']'}
+        // Example: 8e9b6f27-6f5d-445a-8021-305b98865f17[preferredSelection][] for Checkboxes and Radio buttons - must match "name" attribute of fields
+        keyRenderer.@process.appendBracketsForMultipleFields = ${value + '[]'}
+        keyRenderer.@process.appendBracketsForMultipleFields.@if.hasMultipleValues = ${Array.indexOf(multiValueFields, field.nodeType.name) > -1}
+
+        itemRenderer = Neos.Fusion:DataStructure {
+            validators = Neos.Fusion:DataStructure {
+                // All relevant validators from https://formvalidation.io/guide/validators/ are configured here
+
+                notEmpty = Neos.Fusion:DataStructure {
+                    message = Neos.Fusion:Case {
+                        radioButtons  {
+                            condition = ${Array.indexOf(selectOptionFields, field.nodeType.name) > -1}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.radioButtons', 'Please select an option.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        checkboxes  {
+                            condition = ${Array.indexOf(selectAtLeastOneOptionFields, field.nodeType.name) > -1}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.checkboxes', 'Please select at least one option.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        privacyConfirmation  {
+                            condition = ${Array.indexOf(acceptRequiredFields, field.nodeType.name) > -1}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.privacyConfirmation', 'You have to accept the privacy.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        upload  {
+                            condition = ${Array.indexOf(selectFileFields, field.nodeType.name) > -1}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.upload', 'Please select a file.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        default {
+                            condition = ${true}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.default', 'This property is required.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                    }
+                }
+
+                notEmpty.@if.isRequired = ${field.properties.isRequired}
+
+                emailAddress = Neos.Fusion:DataStructure {
+                    message = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.emailAddress', 'Please insert a vali e-mail address.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                    requireGlobalDomain = true
+                }
+                emailAddress.@if.isEmailField = ${Array.indexOf(emailFields, field.nodeType.name) > -1}
+
+                stringLength = Neos.Fusion:DataStructure {
+                    message = Neos.Fusion:Case {
+                        hasCustomErrorMessage {
+                            condition = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage)}
+                            renderer = ${field.properties.customErrorMessage}
+                        }
+                        onlyMinimumIsSet {
+                            condition = ${!String.isBlank(field.properties.minimumLength) && String.isBlank(field.properties.maximumLength)}
+                            renderer = ${Translation.translate('form.stringLength.onlyMinimumIsSet', 'There has to be at least ' + field.properties.minimumLength + ' characters.', {minLength: field.properties.minimumLength}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        onlyMaximumIsSet {
+                            condition = ${!String.isBlank(field.properties.maximumLength) && String.isBlank(field.properties.minimumLength)}
+                              renderer = ${Translation.translate('form.stringLength.onlyMaximumIsSet', 'There can only be ' + field.properties.maximumLength + ' characters.', {maxLength: field.properties.maximumLength}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        minimumAndMaximumAreSet {
+                            condition = ${!String.isBlank(field.properties.minimumLength) && !String.isBlank(field.properties.maximumLength)}
+                              renderer = ${Translation.translate('form.stringLength.minimumAndMaximumAreSet', 'There has to be between ' + field.properties.minimumLength + ' and ' + field.properties.maximumLength + ' characters.', {minLength: field.properties.minimumLength, maxLength: field.properties.maximumLength}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                    }
+                    min = ${field.properties.minimumLength}
+                    min.@if.hasMinimumLength = ${field.properties.minimumLength}
+                    max = ${field.properties.maximumLength}
+                    max.@if.hasMaximumLength = ${field.properties.maximumLength}
+                }
+                stringLength.@if.hasMinimumOrMaximumLength = ${field.properties.minimumLength || field.properties.maximumLength}
+
+                file = Neos.Fusion:DataStructure {
+                    message = Neos.Fusion:Case {
+                        hasCustomErrorMessage {
+                            condition = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage)}
+                            renderer = ${field.properties.customErrorMessage}
+                        }
+                        onlyAllowedExtensionsAreSet {
+                            condition = ${field.properties.allowedExtensions && !field.properties.allowedFilesize}
+                            renderer = ${Translation.translate('form.file.onlyAllowedExtensionsAreSet', 'Allowed file types: ' + Array.join(field.properties.allowedExtensions, ', ') + '.', {allowedExtensions: Array.join(field.properties.allowedExtensions, ', ')}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        onlyAllowedFilesizeIsSet {
+                            condition = ${field.properties.allowedFilesize && !field.properties.allowedExtensions}
+                            renderer = ${Translation.translate('form.file.onlyAllowedFilesizeIsSet', 'Maximum file size: ' + field.properties.allowedFilesize + '.', {allowedFilesize: FileSize.format(field.properties.allowedFilesize)}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        allowedExtensionsAndAllowedFilesizeIsSet {
+                            condition = ${field.properties.allowedFilesize && field.properties.allowedExtensions}
+                            renderer = ${Translation.translate('form.file.allowedExtensionsAndAllowedFilesizeIsSet', 'Allowed file types: ' + Array.join(field.properties.allowedExtensions, ', ') + '. Maximum file size: ' + field.properties.allowedFilesize + '.', {allowedExtensions: Array.join(field.properties.allowedExtensions, ', '), allowedFilesize: FileSize.format(field.properties.allowedFilesize)}, 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                    }
+                    extension = ${Array.join(field.properties.allowedExtensions, ',')}
+                    extension.@if.hasAllowedExtension = ${field.properties.allowedExtensions}
+                    maxSize = ${field.properties.allowedFilesize}
+                    maxSize.@if.hasAllowedFilesize = ${field.properties.allowedFilesize}
+                }
+                file.@if.isUploadField = ${field.nodeType.name == 'Sitegeist.PaperTiger:Field.Upload'}
+            }
+        }
+    }
+}

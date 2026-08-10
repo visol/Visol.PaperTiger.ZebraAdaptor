@@ -1,0 +1,22 @@
+# Disable field types by setting the constraint superType to false
+Sitegeist.PaperTiger:Field.FriendlyCaptcha:
+  superTypes:
+    'Sitegeist.PaperTiger:Field.Constraint': false
+
+Sitegeist.PaperTiger:Field.Slider:
+  superTypes:
+    'Sitegeist.PaperTiger:Field.Constraint': false
+
+Sitegeist.PaperTiger:Field.Date:
+  superTypes:
+    'Sitegeist.PaperTiger:Field.Constraint': false
+
+# TODO: Decide, if this should be enabled
+Sitegeist.PaperTiger:Field.Number:
+  superTypes:
+    'Sitegeist.PaperTiger:Field.Constraint': false
+
+# TODO: Decide, if this should be enabled
+Sitegeist.PaperTiger:Field.TelephoneNumber:
+  superTypes:
+    'Sitegeist.PaperTiger:Field.Constraint': false

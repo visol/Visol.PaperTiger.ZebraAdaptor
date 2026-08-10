@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="de">
+    <body>
+      <trans-unit id="form.actionCollection.message.empty" xml:space="preserve">
+        <source>No form action has been added yet.</source>
+        <target>Es wurde noch keine Formular-Aktion eingefügt.</target>
+      </trans-unit>
+      <trans-unit id="form.fieldCollection.message.empty" xml:space="preserve">
+        <source>The fieldset contains no fields yet.</source>
+        <target>Die Feldgruppe enthält noch keine Felder.</target>
+      </trans-unit>
+      <trans-unit id="actionCollection.fieldNames.hint" xml:space="preserve">
+        <source>Click a field placeholder to copy it to the clipboard, then paste it into the e-mail content.</source>
+        <target>Klicken Sie auf einen Feld-Platzhalter, um ihn in die Zwischenablage zu kopieren und über den Button "E-Mail-Inhalt" im Text einzufügen.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

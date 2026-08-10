@@ -1,0 +1,62 @@
+# Emits the client-side validation trigger events consumed by the frontend form renderer.
+# Included in the content API payload via Api/Content/Form.fusion.
+prototype(Visol.PaperTiger.ZebraAdaptor:TriggerSchema) < prototype(Neos.Fusion:Component) {
+    formIdentifier = ''
+    fields = null
+
+    @context {
+        // Field types registered under Visol.PaperTiger.ZebraAdaptor.fieldTypes.
+        // Domain packages extend these lists in their own Settings.yaml rather
+        // than this package knowing about them.
+
+        // don't add any trigger configuration for these field types
+        omitNamedFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.omitted')}
+        // keyup trigger for these field types
+        keyUpEventFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.triggerEvents.keyup')}
+        // blur and input trigger for these field types
+        blurAndInputEventFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.triggerEvents.blurAndInput')}
+        // change trigger for these field types
+        changeEventFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.triggerEvents.change')}
+        // change and blur trigger for these field types
+        changeAndBlurEventFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.triggerEvents.changeAndBlur')}
+        // multi-value fields need [] appended to match the name attribute in the frontend.
+        // Only genuine checkbox groups are multi-value; radio buttons and single
+        // checkboxes store a scalar and submit without the [] suffix.
+        multiValueFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.multiValue')}
+    }
+
+    renderer = Neos.Fusion:Map {
+
+        // Ignore buttons here and fields without name, e.g. Honeypot
+        items = ${Array.filter(props.fields, item => (item.properties.name && Array.indexOf(omitNamedFields, item.nodeType.name) == -1))}
+        itemName = 'field'
+
+        keyRenderer = ${props.formIdentifier + '[' + field.properties.name + ']'}
+        keyRenderer.@process.appendBracketsForMultipleFields = ${value + '[]'}
+        keyRenderer.@process.appendBracketsForMultipleFields.@if.hasMultipleValues = ${Array.indexOf(multiValueFields, field.nodeType.name) > -1}
+
+        itemRenderer = Neos.Fusion:Case {
+            change {
+                condition = ${Array.indexOf(changeEventFields, field.nodeType.name) > -1}
+                renderer = "change"
+            }
+            blurAndInput {
+                condition = ${Array.indexOf(blurAndInputEventFields, field.nodeType.name) > -1}
+                renderer = "blur input"
+            }
+            keyup {
+                condition = ${Array.indexOf(keyUpEventFields, field.nodeType.name) > -1}
+                renderer = "keyup"
+            }
+            changeAndBlur {
+                condition = ${Array.indexOf(changeAndBlurEventFields, field.nodeType.name) > -1}
+                renderer = "change blur"
+            }
+            blur {
+                // default event
+                condition = ${true}
+                renderer = "blur"
+            }
+        }
+    }
+}

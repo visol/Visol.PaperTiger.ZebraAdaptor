@@ -1,0 +1,44 @@
+{
+    "name": "visol/neos-papertiger-zebraadaptor",
+    "description": "Renders Sitegeist.PaperTiger forms through a headless Neos content API (Zebra / Next.js) instead of Fusion",
+    "type": "neos-package",
+    "license": "MIT",
+    "keywords": [
+        "neos",
+        "neos-package",
+        "papertiger",
+        "forms",
+        "zebra",
+        "headless",
+        "nextjs"
+    ],
+    "authors": [
+        {
+            "name": "visol digitale Dienstleistungen GmbH",
+            "homepage": "https://visol.ch"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "neos/flow": "^8.3",
+        "neos/neos": "^8.3",
+        "neos/fusion-form": "*",
+        "networkteam/neos-contentapi": "*",
+        "sitegeist/papertiger": "*",
+        "sitegeist/neos-symfonymailer": "*",
+        "sitegeist/fusionform-upload": "*",
+        "wegmeister/databasestorage": "*",
+        "flowpack/monolog": "*",
+        "soundasleep/html2text": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Visol\\PaperTiger\\ZebraAdaptor\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Visol.PaperTiger.ZebraAdaptor"
+        }
+    }
+}

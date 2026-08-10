@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="en">
+    <body>
+      <trans-unit id="properties.name" xml:space="preserve">
+        <source>Fieldname</source>
+        <target>Fieldname</target>
+      </trans-unit>
+      <trans-unit id="properties.name.ui.help.message" xml:space="preserve">
+        <source>A technical identifier for the field. Must only contain number and chars.</source>
+        <target>A technical identifier for the field. Must only contain number and chars.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

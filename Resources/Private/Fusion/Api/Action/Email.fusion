@@ -1,0 +1,14 @@
+# Extend BaseNode to include form field data for email action nodes.
+# This makes the form's field names available in the content API node data so the
+# frontend can offer them as placeholders when editing the e-mail body.
+prototype(Networkteam.Neos.ContentApi:BaseNode) {
+  formFields = Neos.Fusion:Map {
+    items = ${q(node).closest('[instanceof Sitegeist.PaperTiger:Form]').find('[instanceof Sitegeist.PaperTiger:Field]').get()}
+    itemName = 'item'
+    itemRenderer = Neos.Fusion:DataStructure {
+      identifier = ${item.identifier}
+      fieldName = ${q(item).property('name')}
+    }
+  }
+  formFields.@if.isEmailAction = ${node.nodeType.name == 'Sitegeist.PaperTiger:Action.Email'}
+}

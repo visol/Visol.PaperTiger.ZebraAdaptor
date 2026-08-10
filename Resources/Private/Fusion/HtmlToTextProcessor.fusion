@@ -1,0 +1,4 @@
+prototype(Visol.PaperTiger.ZebraAdaptor:HtmlToTextProcessor) < prototype(Neos.Fusion:Value) {
+    @class = 'Visol\\PaperTiger\\ZebraAdaptor\\FusionObjects\\HtmlToTextProcessorImplementation'
+    value = ${value}
+}

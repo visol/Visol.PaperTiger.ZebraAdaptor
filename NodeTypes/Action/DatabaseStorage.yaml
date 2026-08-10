@@ -1,0 +1,28 @@
+Visol.PaperTiger.ZebraAdaptor:Action.DatabaseStorage:
+  label: "${(q(node).property('formIdentifier') ? 'Storage: ' + q(node).property('formIdentifier') : 'Storage')}"
+  superTypes:
+    'Sitegeist.PaperTiger:Action': true
+  ui:
+    label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.DatabaseStorage:ui.label'
+    icon: 'icon-database'
+  properties:
+    formIdentifier:
+      type: string
+      ui:
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.DatabaseStorage:properties.formIdentifier.ui.label'
+        showInCreationDialog: true
+        inspector:
+          group: 'form'
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.DatabaseStorage:properties.formIdentifier.ui.help.message'
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': []
+        'Neos.Neos/Validation/StringLengthValidator':
+          maximum: 255
+        'Neos.Neos/Validation/RegularExpressionValidator':
+          regularExpression: '/^[a-z0-9\-]+$/i'
+          validationErrorMessage: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.DatabaseStorage:properties.formIdentifier.validation.errorMessage'
+  options:
+    template:
+      properties:
+        formIdentifier: "${data.formIdentifier}"

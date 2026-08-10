@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+	<file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="de">
+		<body>
+			<!-- FiletTypeValidator -->
+			<trans-unit id="1327865587" xml:space="preserve" approved="yes">
+				<source>The given value was not a Resource instance.</source>
+				<target xml:lang="de">Der angegebene Wert ist keine Resource.</target>
+			</trans-unit>
+			<trans-unit id="1327865808" xml:space="preserve" approved="yes">
+				<source>The file has no file extension.</source>
+				<target xml:lang="de">Die Datei hat keine Endung.</target>
+			</trans-unit>
+			<trans-unit id="1327865764" xml:space="preserve" approved="yes">
+				<source>The file extension {0} is not allowed.</source>
+				<target xml:lang="de">Wir können die Datei mit der Endung {0} leider nicht verarbeiten.</target>
+			</trans-unit>
+			<!-- NotEmptyValidator -->
+			<trans-unit id="1221560910" xml:space="preserve" approved="yes">
+				<source>This property is required</source>
+				<target xml:lang="de">Dies ist ein Pflichtfeld.</target>
+			</trans-unit>
+			<trans-unit id="1221560718" xml:space="preserve" approved="yes">
+				<source>This property is required</source>
+				<target xml:lang="de">Dies ist ein Pflichtfeld.</target>
+			</trans-unit>
+			<!-- EmailAddressValidator -->
+			<trans-unit id="1221559976" xml:space="preserve" approved="yes">
+				<source>Please specify a valid email address.</source>
+				<target xml:lang="de">Bitte geben Sie eine gültige E-Mail-Adresse an.</target>
+			</trans-unit>
+			<!-- CaptchaValidator -->
+			<trans-unit id="1450180930" xml:space="preserve" approved="yes">
+				<source>The given value was not a valid string.</source>
+				<target xml:lang="de">Der angegebene Wert ist kein gültiger Text.</target>
+			</trans-unit>
+			<trans-unit id="1450180934" xml:space="preserve" approved="yes">
+				<source>Please check the box "I am not a robot" and try again.</source>
+				<target xml:lang="de">Bitte setzen Sie das Häkchen "Ich bin kein Roboter" und versuchen Sie es erneut.</target>
+			</trans-unit>
+			<trans-unit id="1663365667" xml:space="preserve" approved="yes">
+				<source>The passwords are not identical.</source>
+				<target xml:lang="de">Die Kennwörter stimmen nicht überein.</target>
+			</trans-unit>
+			<trans-unit id="form.fields.radioButtons" xml:space="preserve" approved="yes">
+        <source>Please select an option.</source>
+        <target xml:lang="de">Bitte treffen Sie eine Auswahl.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.checkboxes" xml:space="preserve" approved="yes">
+        <source>Please select at least one option.</source>
+        <target xml:lang="de">Bitte treffen Sie mindestens eine Auswahl.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.privacyConfirmation" xml:space="preserve" approved="yes">
+        <source>You have to accept the privacy.</source>
+        <target xml:lang="de">Sie müssen die Datenschutzerklärung zur Kenntnis nehmen.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.upload" xml:space="preserve" approved="yes">
+        <source>Please select a file.</source>
+        <target xml:lang="de">Bitte wählen Sie eine Datei aus.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.default" xml:space="preserve" approved="yes">
+        <source>This property is required.</source>
+        <target xml:lang="de">Dies ist ein Pflichtfeld.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.emailAddress" xml:space="preserve" approved="yes">
+        <source>Please insert a vali e-mail address.</source>
+        <target xml:lang="de">Bitte geben Sie eine gültige E-Mail-Adresse ein.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.onlyMinimumIsSet" xml:space="preserve" approved="yes">
+        <source>There has to be at least {minLength} characters.</source>
+        <target xml:lang="de">Es müssen mindestens {minLength} Zeichen eingegeben werden.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.onlyMaximumIsSet" xml:space="preserve" approved="yes">
+        <source>There can only be {maxLength} characters.</source>
+        <target xml:lang="de">Es dürfen maximal {maxLength} Zeichen eingegeben werden.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.minimumAndMaximumAreSet" xml:space="preserve" approved="yes">
+        <source>There has to be between {minLength} and {maxLength} characters.</source>
+        <target xml:lang="de">Es müssen zwischen {minLength} und {maxLength} Zeichen eingegeben werden.</target>
+      </trans-unit>
+			<trans-unit id="form.file.onlyAllowedExtensionsAreSet" xml:space="preserve" approved="yes">
+        <source>Allowed file types: {allowedExtensions}.</source>
+        <target xml:lang="de">Es sind folgende Dateiendungen erlaubt: {allowedExtensions}.</target>
+      </trans-unit>
+			<trans-unit id="form.file.onlyAllowedFilesizeIsSet" xml:space="preserve" approved="yes">
+        <source>Maximum file size: {allowedFilesize}.</source>
+        <target xml:lang="de">Die maximale Dateigrösse beträgt: {allowedFilesize}.</target>
+      </trans-unit>
+			<trans-unit id="form.file.allowedExtensionsAndAllowedFilesizeIsSet" xml:space="preserve" approved="yes">
+        <source>Allowed file types: {allowedExtensions}. Maximum file size: {allowedFilesize}.</source>
+        <target xml:lang="de">Es sind folgende Dateiendungen erlaubt: {allowedExtensions}. Die maximale Dateigrösse beträgt {allowedFilesize}.</target>
+      </trans-unit>
+		</body>
+	</file>
+</xliff>

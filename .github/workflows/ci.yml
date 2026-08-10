@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xml, json
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --no-check-lock
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Lint PHP
+        run: find Classes -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: PHPStan
+        run: |
+          composer require --dev --no-progress phpstan/phpstan
+          vendor/bin/phpstan analyse -c phpstan.neon

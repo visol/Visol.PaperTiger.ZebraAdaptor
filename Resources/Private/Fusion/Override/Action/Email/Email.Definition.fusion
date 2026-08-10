@@ -1,0 +1,51 @@
+prototype(Sitegeist.PaperTiger:Action.Email.Definition) {
+    # Allow using markers in all relevant fields
+    recipientName.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+    recipientAddress.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+    senderName.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+    replyToAddress.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+    carbonCopyAddress.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+    blindCarbonCopyAddress.@process.asTemplate = Sitegeist.PaperTiger:Action.DataTemplate
+
+    renderer {
+        options {
+            html.@process.wrapInHtml = ${'
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <style>
+            body {
+                font-family: Calibri, Arial, Helvetica, sans-serif;
+                font-size: 14px;
+                padding: 20px;
+            }
+            dt {
+                font-weight: bold;
+                display: block;
+            }
+            dd {
+                display: block;
+                padding: 0;
+                margin: 0 0 1em 0;
+            }
+        </style>
+    </head>
+    <body>
+            ' + value + '
+    </body>
+</html>
+            '}
+            html.@process.convertUris = Neos.Neos:ConvertUris {
+                absolute = true
+            }
+
+            # For text variant, use the HTML content and process to Plain Text
+            text = ${this.html}
+            text.@process.convertUris = Neos.Neos:ConvertUris {
+                absolute = true
+            }
+            text.@process.htmlToText = Visol.PaperTiger.ZebraAdaptor:HtmlToTextProcessor
+        }
+    }
+}

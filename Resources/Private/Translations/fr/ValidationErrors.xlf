@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+	<file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="fr">
+		<body>
+			<trans-unit id="form.fields.radioButtons" xml:space="preserve" approved="yes">
+        <source>Please select an option.</source>
+        <target xml:lang="fr">Veuillez faire votre choix.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.checkboxes" xml:space="preserve" approved="yes">
+        <source>Please select at least one option.</source>
+        <target xml:lang="fr">Veuillez faire au moins un choix.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.privacyConfirmation" xml:space="preserve" approved="yes">
+        <source>You have to accept the privacy.</source>
+        <target xml:lang="fr">Vous devez accepter la politique de confidentialité.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.upload" xml:space="preserve" approved="yes">
+        <source>Please select a file.</source>
+        <target xml:lang="fr">Veuillez sélectionner un fichier.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.default" xml:space="preserve" approved="yes">
+        <source>This property is required.</source>
+        <target xml:lang="fr">Ce champ est obligatoire.</target>
+      </trans-unit>
+			<trans-unit id="form.fields.emailAddress" xml:space="preserve" approved="yes">
+        <source>Please insert a vali e-mail address.</source>
+        <target xml:lang="fr">Veuillez entrer une adresse e-mail valide.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.onlyMinimumIsSet" xml:space="preserve" approved="yes">
+        <source>There has to be at least {minLength} characters.</source>
+        <target xml:lang="fr">Au moins {minLength} caractères doivent être saisis.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.onlyMaximumIsSet" xml:space="preserve" approved="yes">
+        <source>There can only be {maxLength} characters.</source>
+        <target xml:lang="fr">Il est possible de saisir {maxLength} caractères au maximum.</target>
+      </trans-unit>
+			<trans-unit id="form.stringLength.minimumAndMaximumAreSet" xml:space="preserve" approved="yes">
+        <source>There has to be between {minLength} and {maxLength} characters.</source>
+        <target xml:lang="fr">Il faut saisir entre {minLength} et {maxLength} caractères.</target>
+      </trans-unit>
+			<trans-unit id="form.file.onlyAllowedExtensionsAreSet" xml:space="preserve" approved="yes">
+        <source>Allowed file types: {allowedExtensions}.</source>
+        <target xml:lang="fr">Les extensions de fichier suivantes sont autorisées: {allowedExtensions}.</target>
+      </trans-unit>
+			<trans-unit id="form.file.onlyAllowedFilesizeIsSet" xml:space="preserve" approved="yes">
+        <source>Maximum file size: {allowedFilesize}.</source>
+        <target xml:lang="fr">La taille maximale du fichier est de: {allowedFilesize}.</target>
+      </trans-unit>
+			<trans-unit id="form.file.allowedExtensionsAndAllowedFilesizeIsSet" xml:space="preserve" approved="yes">
+        <source>Allowed file types: {allowedExtensions}. Maximum file size: %s.</source>
+        <target xml:lang="fr">Les extensions de fichier suivantes sont autorisées: {allowedExtensions}. La taille maximale du fichier est de %s.</target>
+      </trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -1,0 +1,13 @@
+# Adds a "helpText" property to every field. Not rendered by this package -
+# it is exposed through the content API for the frontend to render.
+Visol.PaperTiger.ZebraAdaptor:Mixin.HelpText:
+  abstract: true
+  properties:
+    helpText:
+      type: string
+      ui:
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Mixin.HelpText:properties.helpText.label'
+        reloadIfChanged: true
+        inspector:
+          group: form
+          position: 'after placeholder'

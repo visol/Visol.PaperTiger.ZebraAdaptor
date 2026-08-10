@@ -1,0 +1,12 @@
+Neos:
+  Flow:
+    log:
+      psr3:
+        loggerFactory: 'Flowpack\Monolog\LoggerFactory'
+        'Flowpack\Monolog\LoggerFactory':
+          formApiLogger:
+            handler:
+              streamHandler:
+                className: Monolog\Handler\StreamHandler
+                arguments:
+                  0: '%FLOW_PATH_DATA%Logs/FormApi.log'

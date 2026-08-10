@@ -1,0 +1,123 @@
+Sitegeist.PaperTiger:Field.Upload:
+  superTypes:
+    'Sitegeist.PaperTiger:Mixin.IsMultiple': true
+  properties:
+    allowedExtensions:
+      type: array
+      ui:
+        label: i18n
+        reloadIfChanged: true
+        inspector:
+          group: form-validation
+          editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
+          editorOptions:
+            values:
+              'jpeg':
+                label: '.jpeg'
+                icon: 'icon-image'
+                group: 'Image'
+              'jpg':
+                label: '.jpg'
+                icon: 'icon-image'
+                group: 'Image'
+              'png':
+                label: '.png'
+                icon: 'icon-image'
+                group: 'Image'
+              'gif':
+                label: '.gif'
+                icon: 'icon-image'
+                group: 'Image'
+              'tiff':
+                label: '.tiff'
+                icon: 'icon-image'
+                group: 'Image'
+              'heic':
+                label: '.heic'
+                icon: 'icon-image'
+                group: 'Image'
+              'webp':
+                label: '.webp'
+                icon: 'icon-image'
+                group: 'Image'
+              'avif':
+                label: '.avif'
+                icon: 'icon-image'
+                group: 'Image'
+
+              'xls':
+                label: '.xls'
+                icon: 'icon-file-excel-o'
+                group: 'Office'
+              'xlsx':
+                label: '.xlsx'
+                icon: 'icon-file-excel-o'
+                group: 'Office'
+              'doc':
+                label: '.doc'
+                icon: 'icon-file-text'
+                group: 'Office'
+              'docx':
+                label: '.docx'
+                icon: 'icon-file-text'
+                group: 'Office'
+              'odt':
+                label: '.odt'
+                icon: 'icon-file-text'
+                group: 'Office'
+              'pdf':
+                label: '.pdf'
+                icon: 'icon-file-pdf-o'
+                group: 'Other'
+              'csv':
+                label: '.csv'
+                icon: 'icon-file-text'
+                group: 'Other'
+              'zip':
+                label: '.zip'
+                icon: 'icon-archive'
+                group: 'Other'
+
+    allowedFilesize:
+      type: integer
+      ui:
+        label: i18n
+        reloadIfChanged: true
+        inspector:
+          group: form-validation
+          editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
+          editorOptions:
+            allowEmpty: true
+            values:
+              10000:
+                label: '10 KB'
+              50000:
+                label: '50 KB'
+              100000:
+                label: '100 KB'
+              200000:
+                label: '200 KB'
+              300000:
+                label: '300 KB'
+              500000:
+                label: '500 KB'
+              800000:
+                label: '800 KB'
+              1000000:
+                label: '1 MB'
+              3000000:
+                label: '3 MB'
+              5000000:
+                label: '5 MB'
+              8000000:
+                label: '8 MB'
+              10000000:
+                label: '10 MB'
+              20000000:
+                label: '20 MB'
+              50000000:
+                label: '50 MB'
+              100000000:
+                label: '100 MB'
+              128000000:
+                label: '128 MB'

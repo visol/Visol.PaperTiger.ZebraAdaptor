@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="en">
+    <body>
+      <trans-unit id="properties.name.label" xml:space="preserve">
+        <source>Name of the target</source>
+        <target>Name of the target</target>
+      </trans-unit>
+      <trans-unit id="properties.name.help" xml:space="preserve">
+        <source>Only used for the label shown in the backend preview.</source>
+        <target>Only used for the label shown in the backend preview.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

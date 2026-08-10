@@ -1,0 +1,13 @@
+# Allow fields within a fieldset, but not fieldsets within fieldsets
+Sitegeist.PaperTiger:Fieldset:
+  label: "${(q(node).property('label') ? q(node).property('label') : Translation.translate('ui.label', 'Section', [], 'NodeTypes/PaperTiger/Fieldset', 'Visol.PaperTiger.ZebraAdaptor'))}"
+  constraints:
+    nodeTypes:
+      'Sitegeist.PaperTiger:Field.Constraint': true
+      'Sitegeist.PaperTiger:Fieldset': false
+  properties:
+    label:
+      ui:
+        inline:
+          editorOptions:
+            placeholder: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Fieldset:properties.label.placeholder'

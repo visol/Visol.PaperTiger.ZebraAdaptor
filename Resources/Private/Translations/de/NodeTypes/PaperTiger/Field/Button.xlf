@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="de">
+    <body>
+      <trans-unit id="properties.label.help" xml:space="preserve">
+        <source>The text shown on the button. Prefer wording that describes the action, e.g. "Send request".</source>
+        <target>Im Button sichtbarer Text. Wenn möglich ist ein Text zu wählen, der die Aktion umschreibt (z.B. "Anfrage senden").</target>
+      </trans-unit>
+      <trans-unit id="properties.name.help" xml:space="preserve">
+        <source>Invisible technical identifier of the button.</source>
+        <target>Unsichtbare technische Bezeichnung für den Button.</target>
+      </trans-unit>
+      <trans-unit id="properties.value.help" xml:space="preserve">
+        <source>Invisible value that is submitted.</source>
+        <target>Unsichtbarer Wert, der übermittelt wird.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,12 @@
+Sitegeist.PaperTiger:Field:
+  superTypes:
+    'Visol.PaperTiger.ZebraAdaptor:Mixin.HelpText': true
+
+# Disable for certain types
+Sitegeist.PaperTiger:Field.Honeypot:
+  superTypes:
+    'Visol.PaperTiger.ZebraAdaptor:Mixin.HelpText': false
+
+Sitegeist.PaperTiger:Field.Button:
+  superTypes:
+    'Visol.PaperTiger.ZebraAdaptor:Mixin.HelpText': false

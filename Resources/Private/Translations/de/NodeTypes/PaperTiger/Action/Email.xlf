@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="" product-name="Visol.PaperTiger.ZebraAdaptor" source-language="en" datatype="plaintext" target-language="de">
+    <body>
+      <trans-unit id="form.followUpActions.message.empty" xml:space="preserve">
+        <source>The form will not be sent. No form action has been added yet.</source>
+        <target>Das Formular wird nicht gesendet. Es wurde noch keine Formular-Aktion eingefügt.</target>
+      </trans-unit>
+      <trans-unit id="properties.subject" xml:space="preserve">
+        <source>Subject</source>
+        <target>Betreff</target>
+      </trans-unit>
+      <trans-unit id="properties.html" xml:space="preserve">
+        <source>E-mail content</source>
+        <target>E-Mail-Inhalt</target>
+      </trans-unit>
+      <trans-unit id="properties.recipient" xml:space="preserve">
+        <source>Recipient</source>
+        <target>Empfänger</target>
+      </trans-unit>
+      <trans-unit id="properties.sender" xml:space="preserve">
+        <source>Sender</source>
+        <target>Absender</target>
+      </trans-unit>
+      <trans-unit id="properties.recipientAddress.help" xml:space="preserve">
+        <source>Placeholders can be used, e.g. "{email}".</source>
+        <target>Platzhalter können verwendet werden, z.B. "{email}".</target>
+      </trans-unit>
+      <trans-unit id="properties.namePlaceholders.help" xml:space="preserve">
+        <source>Placeholders can be used, e.g. "{firstName} {lastName}".</source>
+        <target>Platzhalter können verwendet werden, z.B. "{firstName} {lastName}".</target>
+      </trans-unit>
+      <trans-unit id="properties.replyToAddress.help" xml:space="preserve">
+        <source>Used when somebody replies to the e-mail. Placeholders can be used, e.g. "{email}".</source>
+        <target>Diese Adresse wird genutzt, wenn jemand auf die Mail antwortet. Platzhalter können verwendet werden, z.B. "{email}".</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,8 @@
+Sitegeist.PaperTiger:Field.Collection:
+  ui:
+    label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Field.Collection:ui.label'
+  constraints:
+    nodeTypes:
+      # Only allow fields within a fieldset
+      'Sitegeist.PaperTiger:Field.Constraint': false
+      'Sitegeist.PaperTiger:Fieldset': true

@@ -1,0 +1,31 @@
+# Sitegeist.PaperTiger:Field.Button already renders as <button type="submit">
+# (see Neos.Fusion.Form:Button), so it is the form's submit button. This override
+# only adjusts the icon and the editor-facing defaults.
+Sitegeist.PaperTiger:Field.Button:
+  ui:
+    label: i18n
+    icon: paper-plane
+    group: form.elements
+    position: 1100
+  superTypes:
+    'Sitegeist.PaperTiger:Field': true
+    'Sitegeist.PaperTiger:Mixin.Label': true
+  properties:
+    label:
+      defaultValue: 'Submit'
+      position: 20
+      ui:
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Field.Button:properties.label.help'
+    name:
+      defaultValue: 'submit'
+      position: 30
+      ui:
+        showInCreationDialog: false
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Field.Button:properties.name.help'
+    value:
+      position: 40
+      ui:
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Field.Button:properties.value.help'
