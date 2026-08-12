@@ -100,8 +100,12 @@ a template split across packages cannot control where the added fields land.
     "thresholdSchema":  { "<uuid>[email]": 0 }
   }
   ```
-  The three schemas are shaped for [FormValidation.io](https://formvalidation.io/) but are plain
-  data — any client-side validator can consume them.
+  The three schemas are shaped for [FormValidation.io](https://formvalidation.io/)-style validators
+  but are plain data — any client-side validator can consume them. See
+  [Wiring the client-side validator](#3-wiring-the-client-side-validator) for a worked
+  [validare](https://github.com/validarejs/validare) example, and
+  [Porting the schema](#porting-the-schema-to-another-validator) for the details that differ between
+  libraries.
 - **Honeypot field nodes** get `timestampWithHmac`.
 - **E-mail action nodes** get `formFields` (`identifier` → `fieldName`), so the editor UI can offer
   the available `{placeholder}` names.
@@ -305,7 +309,7 @@ Each field component then renders whatever markup it likes, as long as the input
 ### 2. The form element
 
 Render the `fields` and `actions` content collections inside a `<form noValidate>` — `noValidate`
-because FormValidation.io replaces native browser validation — plus two hidden inputs:
+because the client-side validator replaces native browser validation — plus two hidden inputs:
 
 ```tsx
 <form id={identifier} ref={formRef} onSubmit={handleSubmit} noValidate>
@@ -325,64 +329,131 @@ Each field wrapper needs an empty container for its error message:
 <div className="validation-result__container" />
 ```
 
-### 3. Wiring FormValidation.io
+### 3. Wiring the client-side validator
 
-The schemas are shaped for [FormValidation.io](https://formvalidation.io/) — a **commercially
-licensed** library, so it is not a dependency of this package and you need your own licence. They
-are plain JSON, so any validator can consume them; if you use something else, map
-`validationSchema` onto its rule format and read `triggerSchema` / `thresholdSchema` for *when* to
-validate.
+The schemas are plain JSON, so any validator can consume them. The reference implementation uses
+**[validare](https://github.com/validarejs/validare)** (`@validare/core`, MIT) — a maintained,
+framework-agnostic rewrite of the same plugin architecture as FormValidation.io. FormValidation.io
+itself still works (see the note at the end of this section), but it is commercially licensed, so
+validare is the default here.
 
-With FormValidation.io (`@form-validation/bundle`, `@form-validation/locales`), the three schemas
-map onto the constructor almost verbatim:
+validare mirrors the FormValidation.io API but is **not** a drop-in — three schema details need
+translating first (see [Porting the schema](#porting-the-schema-to-another-validator)):
+`emailAddress` → `email`, multi-event trigger strings are reduced to one event, and `notEmpty` on a
+checkbox/radio group becomes a group-aware rule. With those handled:
 
 ```tsx
-import { formValidation } from '@form-validation/bundle/popular'
-import { Trigger } from '@form-validation/plugin-trigger'
-import { Message } from '@form-validation/plugin-message'
-import { de_DE } from '@form-validation/locales/de_DE'
+import { validare, Trigger } from '@validare/core'
+import type { ElementValidatedPayload, ValidatorInput, ValidatorResult } from '@validare/core'
+import { deDE } from './validareDeDE'   // validare ships only en_US / pt_BR — supply German yourself
 
-fvRef.current = formValidation(formRef.current, {
-  locale: 'de_DE',
-  localization: de_DE,
-  fields: validationSchema,          // ← straight from the payload
-  plugins: {
-    trigger: new Trigger({
-      event: triggerSchema,          // ← "blur" | "blur input" | "change" | "change blur"
-      threshold: thresholdSchema,    // ← characters before validating
-    }),
-    message: new Message({
-      // Walk up to the nearest .validation-result__container so the message
-      // lands in your markup instead of being appended next to the input.
-      container: (_field, element) => {
-        let parent = element.parentElement
-        while (parent && parent !== document.body) {
-          const c = parent.querySelector(':scope > .validation-result__container')
-          if (c) return c as HTMLElement
-          parent = parent.parentElement
+// nearest ancestor's own .validation-result__container (server-rendered per field)
+function findResultContainer(el: HTMLElement): HTMLElement | null {
+  for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+    const c = p.querySelector(':scope > .validation-result__container')
+    if (c) return c as HTMLElement
+  }
+  return null
+}
+
+// (a) emailAddress → email; notEmpty on checkbox/radio groups → group-aware callback
+function buildFields(schema: Record<string, any>, form: HTMLFormElement) {
+  const fields: Record<string, any> = {}
+  for (const [name, def] of Object.entries<any>(schema)) {
+    const els = Array.from(form.querySelectorAll(`[name="${name}"]`)) as HTMLInputElement[]
+    const isGroup = els.length > 0 && els.every((el) => el.type === 'checkbox' || el.type === 'radio')
+    const validators: Record<string, any> = {}
+    for (const [v, opts] of Object.entries<any>(def.validators ?? {})) {
+      if (v === 'notEmpty' && isGroup) {
+        validators.callback = {
+          message: opts.message,
+          callback: (input: ValidatorInput): ValidatorResult => ({
+            valid: input.elements.some((el) => (el as HTMLInputElement).checked),
+          }),
         }
-        return element
-      },
-    }),
-  },
+      } else if (v === 'emailAddress') validators.email = opts
+      else validators[v] = opts
+    }
+    fields[name] = { validators }
+  }
+  return fields
+}
+
+// (b) reduce multi-event trigger strings ("blur input") to the single event validare accepts
+const event = Object.fromEntries(
+  Object.entries(triggerSchema).map(([k, v]) => [k, String(v).trim().split(/\s+/)[0]]),
+)
+
+fvRef.current = validare(formRef.current, {
+  locale: deDE,
+  fields: buildFields(validationSchema, formRef.current),
+  plugins: { trigger: new Trigger({ event }) },
 })
+  .on('core.field.invalid', (...a) => {
+    const { elements } = a[0] as { elements: HTMLElement[] }
+    elements[0]?.closest('[data-node-type]')?.classList.add('field--error')
+  })
+  .on('core.field.valid', (...a) => {
+    const { elements } = a[0] as { elements: HTMLElement[] }
+    elements[0]?.closest('[data-node-type]')?.classList.remove('field--error')
+  })
+  // validare's Message plugin can only target ONE global container, so render each
+  // field's messages yourself into its .validation-result__container:
+  .on('core.element.validated', (...a) => {
+    const p = a[0] as ElementValidatedPayload
+    const c = findResultContainer(p.element)
+    if (!c) return
+    c.textContent = p.valid
+      ? ''
+      : Object.values(p.validators).filter((r) => !r.valid && r.message).map((r) => r.message).join(' ')
+  })
 ```
 
 Run this in an effect that fires **once** (guard on the ref) and `destroy()` it on unmount —
 re-initialising on every render leaks listeners and double-renders messages.
 
-`validationSchema` entries look like `{ validators: { notEmpty: { message }, emailAddress: { message, requireGlobalDomain } } }`.
-The messages are already translated server-side into the content dimension's language, so
-`localization` only covers FormValidation's own built-in strings.
+A few things to know:
 
-Field-level error styling is easiest via the library's events:
+- **Event payloads are objects, not strings.** validare's `.on('core.field.invalid' | 'core.field.valid', …)`
+  hands you `{ field, elements }`, not the bare `name` FormValidation.io passed — the single biggest
+  gotcha when porting an old event handler.
+- **Messages come inline from the payload.** `validationSchema` entries look like
+  `{ validators: { notEmpty: { message }, emailAddress: { message, requireGlobalDomain } } }`, already
+  translated server-side into the content dimension's language. validare prefers that inline `message`
+  over the locale, so `deDE` is only a fallback (validare ships no German locale).
+- **react-aria caveat.** If your field components use `react-aria-components` (Select, CheckboxGroup,
+  RadioGroup), they update the underlying form control programmatically, so the native `blur` / `change`
+  events validare's Trigger binds never fire. Bridge each control's React `onChange` / `onSelectionChange`
+  to a deferred re-validate:
+  ```tsx
+  const revalidate = (name: string) =>
+    requestAnimationFrame(() => { fvRef.current?.resetField(name); fvRef.current?.validateField(name) })
+  ```
+  Defer one frame so react-aria has committed the new value before validare reads the DOM, and
+  `resetField` first because `validateField` returns a cached result otherwise.
+- **`thresholdSchema` has no validare equivalent** — its Trigger takes `event` / `delay`, not a
+  per-field character threshold, so a validare consumer ignores `thresholdSchema`.
 
-```tsx
-.on('core.field.invalid', (name) =>
-  form.querySelector(`[name^='${name}']`)?.closest('[data-node-type]')?.classList.add('field--error'))
-.on('core.field.valid', (name) =>
-  form.querySelector(`[name^='${name}']`)?.closest('[data-node-type]')?.classList.remove('field--error'))
-```
+> **Using FormValidation.io instead?** If you hold a licence (`@form-validation/bundle`,
+> `@form-validation/locales`), its constructor consumes the schemas almost verbatim —
+> `fields: validationSchema`, `new Trigger({ event: triggerSchema, threshold: thresholdSchema })`, and
+> a `Message` plugin whose `container` callback can target `.validation-result__container` directly —
+> and needs none of the (a)/(b) translation above. Pass `localization: de_DE` for its built-in strings.
+
+### Porting the schema to another validator
+
+`validationSchema` / `triggerSchema` are FormValidation.io-shaped. Any validator can consume them, but
+three details differ between libraries — each tied to a `fieldTypes.*` behaviour above:
+
+| Detail | Emitted (FormValidation.io shape) | e.g. validare | Source behaviour |
+|---|---|---|---|
+| e-mail validator name | `emailAddress` | `email` | `fieldTypes.email` |
+| trigger value | `"blur input"`, `"change blur"` (space-separated) | one DOM event only | `fieldTypes.triggerEvents.{blurAndInput,changeAndBlur}` |
+| `notEmpty` on a checkbox/radio **group** | "at least one selected" | validates each element → needs a group-aware rule | multi-element field |
+
+The last one is the sharp edge: a validator that checks each element independently marks the group
+invalid unless *every* box is checked (a radio group then never clears), so replace `notEmpty` with a
+rule that inspects the whole element set — as `buildFields` does above.
 
 ### 4. Submitting
 
@@ -465,9 +536,10 @@ The response tells you what to do:
 ### Reference implementation
 
 The ABL monorepo (`neos-next/next`) implements all of the above: `PaperTigerForm`
-(`components/clientComponents/content/paper-tiger-form/`) owns the form element, the
-FormValidation.io lifecycle and the `useFormFieldName` context; one server component per node type
-under `components/serverComponents/content/SitegeistPaperTiger_*` renders the fields; and
+(`components/clientComponents/content/paper-tiger-form/`) owns the form element, the validare
+lifecycle (the `buildFields` transform, trigger-event normalisation, the `deDE` fallback locale and
+the react-aria re-validate bridge) and the `useFormFieldName` context; one server component per node
+type under `components/serverComponents/content/SitegeistPaperTiger_*` renders the fields; and
 `serverActions/submitForm.ts` performs the POST and the cache revalidation.
 
 ## License
