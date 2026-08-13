@@ -9,10 +9,6 @@ prototype(Networkteam.Neos.ContentApi:BaseNode) {
       formIdentifier = ${q(node).property('_identifier')}
       fields = ${q(node).find('[instanceof Sitegeist.PaperTiger:Field]').get()}
     }
-    thresholdSchema = Visol.PaperTiger.ZebraAdaptor:ThresholdSchema {
-      formIdentifier = ${q(node).property('_identifier')}
-      fields = ${q(node).find('[instanceof Sitegeist.PaperTiger:Field]').get()}
-    }
     formIdentifierWithHmac = ${Visol.PaperTiger.ZebraAdaptor.appendHmac(q(node).property('_identifier'))}
     hasActions = ${q(node).children('actions').children().is()}
   }

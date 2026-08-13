@@ -8,7 +8,7 @@ of action nodes, rendered and submitted by Fusion. In a headless setup Fusion ne
 form, so this package does three things instead:
 
 1. **Serialises the form into the content API payload** — field/action nodes plus a client-side
-   validation, trigger and threshold schema, and an HMAC-signed form identifier.
+   validation and trigger schema, and an HMAC-signed form identifier.
 2. **Accepts the submission over JSON** — `FormApiController` validates the HMAC and honeypots,
    runs server-side field validators, and executes the form actions (message, e-mail, redirect,
    database storage, plus anything a domain package registers).
@@ -95,13 +95,14 @@ a template split across packages cannot control where the added fields land.
     "method": "post",
     "formIdentifierWithHmac": "<uuid>::<hmac>",   // submit this as the "__form" field
     "hasActions": true,
-    "validationSchema": { "<uuid>[email]": { "validators": { "notEmpty": { "message": "…" }, … } } },
-    "triggerSchema":    { "<uuid>[email]": "blur input" },
-    "thresholdSchema":  { "<uuid>[email]": 0 }
+    "validationSchema": { "<uuid>[email]": { "validators": { "email": { "message": "…" }, … } } },
+    "triggerSchema":    { "<uuid>[email]": "blur" }
   }
   ```
-  The three schemas are shaped for [FormValidation.io](https://formvalidation.io/) but are plain
-  data — any client-side validator can consume them.
+  The two schemas are [validare](https://www.npmjs.com/package/@validare/core)-native (`@validare/core`)
+  but are plain data — any client-side validator can consume them. Checkbox/radio groups and required
+  consent checkboxes carry a group-aware `"choice": { "min": 1, "message": "…" }` validator instead of
+  `notEmpty`, and each trigger is a single DOM event string.
 - **Honeypot field nodes** get `timestampWithHmac`.
 - **E-mail action nodes** get `formFields` (`identifier` → `fieldName`), so the editor UI can offer
   the available `{placeholder}` names.
@@ -206,12 +207,12 @@ NodeType name, so a subtype of a PaperTiger field must be registered explicitly.
 
 | Key | Effect |
 |---|---|
-| `email` | Adds the `emailAddress` validator |
+| `email` | Adds the `email` validator |
+| `choice` | Required checkable field (radio/checkbox group, consent checkbox): gets the group-aware `choice` (`min: 1`) validator instead of `notEmpty` |
 | `multiValue` | Field name gets the `[]` suffix |
-| `omitted` | No validator/trigger/threshold config; also kept out of `{allFormValues}` |
-| `omittedFromThreshold` | Additionally omitted from the threshold schema |
+| `omitted` | No validator/trigger config; also kept out of `{allFormValues}` |
 | `notEmptyMessage.{selectOption,selectAtLeastOneOption,acceptRequired,selectFile}` | Which "required" message the field gets |
-| `triggerEvents.{keyup,blurAndInput,change,changeAndBlur}` | Client-side validation trigger |
+| `triggerEvents.{keyup,change}` | Client-side validation trigger (single DOM event; unlisted types fall back to `blur`) |
 
 ### E-mail
 
@@ -305,7 +306,7 @@ Each field component then renders whatever markup it likes, as long as the input
 ### 2. The form element
 
 Render the `fields` and `actions` content collections inside a `<form noValidate>` — `noValidate`
-because FormValidation.io replaces native browser validation — plus two hidden inputs:
+because the client-side validator replaces native browser validation — plus two hidden inputs:
 
 ```tsx
 <form id={identifier} ref={formRef} onSubmit={handleSubmit} noValidate>
@@ -325,64 +326,81 @@ Each field wrapper needs an empty container for its error message:
 <div className="validation-result__container" />
 ```
 
-### 3. Wiring FormValidation.io
+### 3. Wiring the client-side validator
 
-The schemas are shaped for [FormValidation.io](https://formvalidation.io/) — a **commercially
-licensed** library, so it is not a dependency of this package and you need your own licence. They
-are plain JSON, so any validator can consume them; if you use something else, map
-`validationSchema` onto its rule format and read `triggerSchema` / `thresholdSchema` for *when* to
-validate.
-
-With FormValidation.io (`@form-validation/bundle`, `@form-validation/locales`), the three schemas
-map onto the constructor almost verbatim:
+The two schemas are [validare](https://www.npmjs.com/package/@validare/core)-native
+(`@validare/core`), so the consumer feeds them to the constructor directly — no adapter step:
 
 ```tsx
-import { formValidation } from '@form-validation/bundle/popular'
-import { Trigger } from '@form-validation/plugin-trigger'
-import { Message } from '@form-validation/plugin-message'
-import { de_DE } from '@form-validation/locales/de_DE'
+import { validare, Trigger } from '@validare/core'
+import type { ElementValidatedPayload } from '@validare/core'
+import { deDE } from '@/lib/validation/validareDeDE'
 
-fvRef.current = formValidation(formRef.current, {
-  locale: 'de_DE',
-  localization: de_DE,
-  fields: validationSchema,          // ← straight from the payload
+fvRef.current = validare(formRef.current, {
+  locale: deDE,
+  fields: JSON.parse(validationSchema),        // ← straight from the payload
   plugins: {
     trigger: new Trigger({
-      event: triggerSchema,          // ← "blur" | "blur input" | "change" | "change blur"
-      threshold: thresholdSchema,    // ← characters before validating
-    }),
-    message: new Message({
-      // Walk up to the nearest .validation-result__container so the message
-      // lands in your markup instead of being appended next to the input.
-      container: (_field, element) => {
-        let parent = element.parentElement
-        while (parent && parent !== document.body) {
-          const c = parent.querySelector(':scope > .validation-result__container')
-          if (c) return c as HTMLElement
-          parent = parent.parentElement
-        }
-        return element
-      },
+      event: JSON.parse(triggerSchema),        // ← { "<uuid>[field]": "blur" | "change" | "keyup" }
     }),
   },
 })
 ```
 
+`validationSchema` is already validare-shaped: `email` (not `emailAddress`, and no
+`requireGlobalDomain`), `choice: { min: 1, message }` on radio/checkbox groups and consent
+checkboxes (validare validates each element and its group-aware `choice` counts checked ones, so a
+group passes as soon as one is selected), and `notEmpty` only on non-checkable required fields.
+`triggerSchema` is one DOM event string per field, passed straight to `addEventListener`. The
+messages are already translated server-side into the content dimension's language, so `locale` only
+covers validare's own built-in strings.
+
 Run this in an effect that fires **once** (guard on the ref) and `destroy()` it on unmount —
 re-initialising on every render leaks listeners and double-renders messages.
 
-`validationSchema` entries look like `{ validators: { notEmpty: { message }, emailAddress: { message, requireGlobalDomain } } }`.
-The messages are already translated server-side into the content dimension's language, so
-`localization` only covers FormValidation's own built-in strings.
-
-Field-level error styling is easiest via the library's events:
+validare's `Message` plugin renders into a single global container, so render each element's
+messages yourself into its own server-rendered `.validation-result__container` (the same node the
+server-side `422` handler writes into) via the `core.element.validated` event, and drive field-level
+error styling from the field events:
 
 ```tsx
-.on('core.field.invalid', (name) =>
-  form.querySelector(`[name^='${name}']`)?.closest('[data-node-type]')?.classList.add('field--error'))
-.on('core.field.valid', (name) =>
-  form.querySelector(`[name^='${name}']`)?.closest('[data-node-type]')?.classList.remove('field--error'))
+  .on('core.field.invalid', (payload) =>
+    payload.elements[0]?.closest('[data-node-type]')?.classList.add('field--error'))
+  .on('core.field.valid', (payload) =>
+    payload.elements[0]?.closest('[data-node-type]')?.classList.remove('field--error'))
+  .on('core.element.validated', (payload: ElementValidatedPayload) => {
+    const container = findResultContainer(payload.element)   // walk up to nearest .validation-result__container
+    if (!container) return
+    container.textContent = payload.valid ? '' : Object.values(payload.validators)
+      .filter((r) => !r.valid && r.message).map((r) => r.message).join(' ')
+  })
 ```
+
+react-aria field components (dropdown, checkboxes, radio buttons) update the underlying form element
+programmatically, so the native DOM events `Trigger` listens to never fire. Bridge them: expose a
+`revalidateField(name)` through context that those components call on change — deferred one frame so
+react-aria has committed the value, and resetting the field first because `validate()` early-returns
+a cached result:
+
+```tsx
+const revalidateField = useCallback((name?: string) => {
+  if (!name) return
+  requestAnimationFrame(() => {
+    const fv = fvRef.current
+    if (!fv) return
+    fv.resetField(name)
+    void fv.validateField(name)
+  })
+}, [])
+```
+
+Both schemas are plain JSON, so a different client-side validator can consume them too. The
+adaptations that used to live in the frontend are now handled server-side — `email` is already
+named validare-style, each trigger is already a single event, and required groups already carry
+`choice` instead of `notEmpty`. The one thing any other library still has to provide is a
+**group-aware "at least one checked" rule** to back the `choice` entries: validate the whole element
+set (count `elements.filter(el => el.checked)`) rather than a single element's value, or a
+radio/checkbox group can never pass.
 
 ### 4. Submitting
 
@@ -466,7 +484,7 @@ The response tells you what to do:
 
 The ABL monorepo (`neos-next/next`) implements all of the above: `PaperTigerForm`
 (`components/clientComponents/content/paper-tiger-form/`) owns the form element, the
-FormValidation.io lifecycle and the `useFormFieldName` context; one server component per node type
+validare lifecycle and the `useFormFieldName` context; one server component per node type
 under `components/serverComponents/content/SitegeistPaperTiger_*` renders the fields; and
 `serverActions/submitForm.ts` performs the POST and the cache revalidation.
 

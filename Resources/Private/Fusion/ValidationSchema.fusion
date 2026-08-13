@@ -14,8 +14,11 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
         // Only genuine checkbox groups are multi-value; radio buttons and the single
         // privacy-confirmation checkbox store a scalar and submit without the [] suffix.
         multiValueFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.multiValue')}
-        // field types that get the emailAddress validator
+        // field types that get the email validator
         emailFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.email')}
+        // checkable field types (radio/checkbox groups, consent checkboxes) that get
+        // the group-aware `choice` validator instead of notEmpty
+        choiceFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.choice')}
         // field types per "required field is empty" message category
         selectOptionFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.selectOption')}
         selectAtLeastOneOptionFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.notEmptyMessage.selectAtLeastOneOption')}
@@ -36,9 +39,29 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
 
         itemRenderer = Neos.Fusion:DataStructure {
             validators = Neos.Fusion:DataStructure {
-                // All relevant validators from https://formvalidation.io/guide/validators/ are configured here
+                // Emits validare-native validators (@validare/core): notEmpty, choice, email, stringLength, file.
 
+                // Non-checkable required fields (text, upload, …) use validare's
+                // notEmpty, which reads a single element's value.
                 notEmpty = Neos.Fusion:DataStructure {
+                    message = Neos.Fusion:Case {
+                        upload  {
+                            condition = ${Array.indexOf(selectFileFields, field.nodeType.name) > -1}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.upload', 'Please select a file.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                        default {
+                            condition = ${true}
+                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.default', 'This property is required.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                        }
+                    }
+                }
+
+                notEmpty.@if.isRequired = ${field.properties.isRequired && Array.indexOf(choiceFields, field.nodeType.name) == -1}
+
+                // Checkable required fields (radio/checkbox groups, consent checkboxes)
+                // use validare's group-aware `choice`, which counts checked elements
+                // against min/max. `min: 1` means "at least one selected".
+                choice = Neos.Fusion:DataStructure {
                     message = Neos.Fusion:Case {
                         radioButtons  {
                             condition = ${Array.indexOf(selectOptionFields, field.nodeType.name) > -1}
@@ -52,24 +75,19 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
                             condition = ${Array.indexOf(acceptRequiredFields, field.nodeType.name) > -1}
                             renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.privacyConfirmation', 'You have to accept the privacy.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
                         }
-                        upload  {
-                            condition = ${Array.indexOf(selectFileFields, field.nodeType.name) > -1}
-                            renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.upload', 'Please select a file.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
-                        }
                         default {
                             condition = ${true}
                             renderer = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.default', 'This property is required.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
                         }
                     }
+                    min = 1
                 }
+                choice.@if.isRequiredChoice = ${field.properties.isRequired && Array.indexOf(choiceFields, field.nodeType.name) > -1}
 
-                notEmpty.@if.isRequired = ${field.properties.isRequired}
-
-                emailAddress = Neos.Fusion:DataStructure {
+                email = Neos.Fusion:DataStructure {
                     message = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.emailAddress', 'Please insert a vali e-mail address.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
-                    requireGlobalDomain = true
                 }
-                emailAddress.@if.isEmailField = ${Array.indexOf(emailFields, field.nodeType.name) > -1}
+                email.@if.isEmailField = ${Array.indexOf(emailFields, field.nodeType.name) > -1}
 
                 stringLength = Neos.Fusion:DataStructure {
                     message = Neos.Fusion:Case {

@@ -16,7 +16,7 @@ Visol:
       # the submission with HTTP 422 and surface inline in the frontend.
       formFieldValidators: {}
       # Field NodeType names grouped by the behaviour they trigger in the
-      # generated schemas (ValidationSchema / TriggerSchema / ThresholdSchema).
+      # generated schemas (ValidationSchema / TriggerSchema).
       # Domain packages contribute their own field types here so this package
       # stays customer-agnostic. Keys are arbitrary labels and only need to be
       # unique across packages; the values are the NodeType names.
@@ -27,15 +27,14 @@ Visol:
         # Multi-value fields -> their name attribute carries the [] suffix.
         multiValue:
           paperTigerCheckBoxes: 'Sitegeist.PaperTiger:Field.CheckBoxes'
-        # Never receive validator / trigger / threshold configuration.
+        # Checkable inputs/groups -> group-aware `choice` (min 1) instead of notEmpty.
+        choice:
+          paperTigerRadioButtons: 'Sitegeist.PaperTiger:Field.RadioButtons'
+          paperTigerCheckBoxes: 'Sitegeist.PaperTiger:Field.CheckBoxes'
+          # domain packages: register consent/privacy checkbox field types here too
+        # Never receive validator / trigger configuration.
         omitted:
           paperTigerButton: 'Sitegeist.PaperTiger:Field.Button'
-        # Additionally omitted from the threshold schema (non-text inputs).
-        omittedFromThreshold:
-          paperTigerCheckBoxes: 'Sitegeist.PaperTiger:Field.CheckBoxes'
-          paperTigerRadioButtons: 'Sitegeist.PaperTiger:Field.RadioButtons'
-          paperTigerDropdown: 'Sitegeist.PaperTiger:Field.Dropdown'
-          paperTigerUpload: 'Sitegeist.PaperTiger:Field.Upload'
         # Which "this required field is empty" message a field type gets.
         # Domain packages assign their own field types to one of these
         # categories; anything unlisted falls back to form.fields.default.
@@ -52,14 +51,13 @@ Visol:
           selectFile:
             paperTigerUpload: 'Sitegeist.PaperTiger:Field.Upload'
         # Client-side validation trigger events, keyed by event class.
+        # validare's Trigger accepts exactly one DOM event per field, so each
+        # category maps to a single addEventListener event name.
         triggerEvents:
           keyup: {}
-          blurAndInput:
-            paperTigerEmail: 'Sitegeist.PaperTiger:Field.Email'
           change:
             paperTigerCheckBoxes: 'Sitegeist.PaperTiger:Field.CheckBoxes'
             paperTigerRadioButtons: 'Sitegeist.PaperTiger:Field.RadioButtons'
-          changeAndBlur:
             paperTigerUpload: 'Sitegeist.PaperTiger:Field.Upload'
       # Field NodeType names (keys) whose presence in a form means the form
       # embeds server-computed data into the cached document. Only submissions of
