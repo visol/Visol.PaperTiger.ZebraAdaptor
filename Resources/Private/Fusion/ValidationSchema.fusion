@@ -14,7 +14,7 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
         // Only genuine checkbox groups are multi-value; radio buttons and the single
         // privacy-confirmation checkbox store a scalar and submit without the [] suffix.
         multiValueFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.multiValue')}
-        // field types that get the email validator
+        // field types that get the email regexp validator (TLD-requiring)
         emailFields = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.email')}
         // checkable field types (radio/checkbox groups, consent checkboxes) that get
         // the group-aware `choice` validator instead of notEmpty
@@ -39,7 +39,7 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
 
         itemRenderer = Neos.Fusion:DataStructure {
             validators = Neos.Fusion:DataStructure {
-                // Emits validare-native validators (@validare/core): notEmpty, choice, email, stringLength, file.
+                // Emits validare-native validators (@validare/core): notEmpty, choice, regexp (email), stringLength, file.
 
                 // Non-checkable required fields (text, upload, …) use validare's
                 // notEmpty, which reads a single element's value.
@@ -84,10 +84,18 @@ prototype(Visol.PaperTiger.ZebraAdaptor:ValidationSchema) < prototype(Neos.Fusio
                 }
                 choice.@if.isRequiredChoice = ${field.properties.isRequired && Array.indexOf(choiceFields, field.nodeType.name) > -1}
 
-                email = Neos.Fusion:DataStructure {
+                // validare's built-in `email` validator uses the WHATWG regex, which accepts
+                // dotless domains (e.g. `a@b`) and single-char TLDs (`a@b.c`). Emit `regexp` with
+                // the same character set but a domain that requires a dot and a final label (TLD)
+                // of at least 2 chars (e.g. `a@b.ch`; rejects `a@b` and `a@b.c`) — this restores
+                // and tightens FormValidation.io's `requireGlobalDomain: true` behaviour that was
+                // lost when `emailAddress` became validare's `email`. `[.]` is a literal dot, which
+                // avoids backslash escaping surviving Fusion -> JSON -> new RegExp().
+                regexp = Neos.Fusion:DataStructure {
                     message = ${field.properties.customErrorMessageEnabled && !String.isBlank(field.properties.customErrorMessage) ? field.properties.customErrorMessage : Translation.translate('form.fields.emailAddress', 'Please insert a vali e-mail address.', [], 'ValidationErrors', 'Visol.PaperTiger.ZebraAdaptor', null, Array.first(String.split(documentNode.context.dimensions.language[0], '_')))}
+                    regexp = ${'^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:[.][a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*[.][a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$'}
                 }
-                email.@if.isEmailField = ${Array.indexOf(emailFields, field.nodeType.name) > -1}
+                regexp.@if.isEmailField = ${Array.indexOf(emailFields, field.nodeType.name) > -1}
 
                 stringLength = Neos.Fusion:DataStructure {
                     message = Neos.Fusion:Case {
