@@ -166,8 +166,12 @@ class FormService
             $text,
             $html,
             $this->replacePlaceholders($replyToAddress, $formValues),
-            $carbonCopyAddress ?? null,
-            $blindCarbonCopyAddress ?? null,
+            $carbonCopyAddress !== null && $carbonCopyAddress !== ''
+                ? $this->replacePlaceholders($carbonCopyAddress, $formValues)
+                : null,
+            $blindCarbonCopyAddress !== null && $blindCarbonCopyAddress !== ''
+                ? $this->replacePlaceholders($blindCarbonCopyAddress, $formValues)
+                : null,
         );
 
         if ($attachUploads === true) {
