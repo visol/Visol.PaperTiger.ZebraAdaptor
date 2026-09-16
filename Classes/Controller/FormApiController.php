@@ -347,6 +347,9 @@ class FormApiController extends ActionController
                 $carbonCopyAddress = $formAction->getProperty('carbonCopyAddress');
                 $blindCarbonCopyAddress = $formAction->getProperty('blindCarbonCopyAddress');
                 $attachUploads = $formAction->getProperty('attachUploads');
+                // Assets an editor picked on the action; a node property of an
+                // asset type yields null while nothing is selected.
+                $attachments = $formAction->getProperty('attachments') ?? [];
                 $formValues = $this->getFormValues($formData, $formIdentifier);
                 $fieldLabelMap = $this->getFieldLabelMap($formNode);
                 $excludeFieldNames = $this->getNonDataFieldNames($formNode);
@@ -365,7 +368,8 @@ class FormApiController extends ActionController
                         blindCarbonCopyAddress: $blindCarbonCopyAddress,
                         attachUploads:          $attachUploads,
                         fieldLabelMap:          $fieldLabelMap,
-                        excludeFieldNames:      $excludeFieldNames
+                        excludeFieldNames:      $excludeFieldNames,
+                        attachments:            $attachments
                     );
                     $this->formApiLogger->info(
                         'Email sent with subject: ' . $subject,

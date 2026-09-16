@@ -30,6 +30,14 @@
         <source>Placeholders can be used, e.g. "{firstName} {lastName}".</source>
         <target>Placeholders can be used, e.g. "{firstName} {lastName}".</target>
       </trans-unit>
+      <trans-unit id="properties.attachments" xml:space="preserve">
+        <source>Attachments</source>
+        <target>Attachments</target>
+      </trans-unit>
+      <trans-unit id="properties.attachments.help" xml:space="preserve">
+        <source>These files are attached to every e-mail this action sends, regardless of what the visitor submitted.</source>
+        <target>These files are attached to every e-mail this action sends, regardless of what the visitor submitted.</target>
+      </trans-unit>
       <trans-unit id="properties.replyToAddress.help" xml:space="preserve">
         <source>Used when somebody replies to the e-mail. Placeholders can be used, e.g. "{email}".</source>
         <target>Used when somebody replies to the e-mail. Placeholders can be used, e.g. "{email}".</target>

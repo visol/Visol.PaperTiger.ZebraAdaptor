@@ -74,6 +74,18 @@ Sitegeist.PaperTiger:Action.Email:
     'blindCarbonCopyAddress':
       ui:
         reloadIfChanged: true
+    # Files an editor picks from the media browser, attached to every mail this
+    # action sends - the information sheet or the form to fill in that a
+    # confirmation mail is expected to carry. The uploads the visitor sent are a
+    # separate switch ('attachUploads') on the same action.
+    'attachments':
+      type: array<Neos\Media\Domain\Model\Asset>
+      ui:
+        label: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.Email:properties.attachments'
+        help:
+          message: 'Visol.PaperTiger.ZebraAdaptor:NodeTypes.PaperTiger.Action.Email:properties.attachments.help'
+        inspector:
+          group: 'form'
     # Only meaningful in a Fusion-rendered setup, where it var_dumps the mail
     # instead of sending it. This package sends via FormApiController.
     'testMode':

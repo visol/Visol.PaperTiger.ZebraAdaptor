@@ -251,6 +251,31 @@ Other settings:
 The `{allFormValues}` placeholder in the e-mail body renders a definition list of every submitted
 field. Individual fields are available as `{fieldName}`.
 
+Two kinds of attachment can ride along:
+
+| Property | What it attaches |
+|---|---|
+| `attachUploads` | The files the visitor uploaded with the submission. |
+| `attachments` | Assets an editor picked from the media browser — the information sheet a confirmation mail is expected to carry. Attached to every mail this action sends. |
+
+Both read the resource's stream, so an asset in a cloud storage works. Neither checks the size:
+what a mail relay accepts is its own setting, and a few large assets on a busy form add up.
+
+`attachments` accepts every asset source the installation has. If one of yours removes assets
+behind the editor's back — an external source that unpublishes what vanished upstream — restrict
+the picker in your own override, because the action has no way to notice a reference going dead:
+
+```yaml
+'Sitegeist.PaperTiger:Action.Email':
+  properties:
+    'attachments':
+      ui:
+        inspector:
+          editorOptions:
+            constraints:
+              assetSources: ['neos']
+```
+
 ---
 
 ## Translations
