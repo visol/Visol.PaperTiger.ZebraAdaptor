@@ -109,6 +109,10 @@ class FormService
             // visol change:  Add case for CachedUploadedFile
         } elseif ($value instanceof CachedUploadedFile) {
             return $value->getClientFilename() ?? '';
+            // visol change: Add case for PersistentResource, which is what
+            // FormApiController resolves an [_uploadedFileIdentifier] into.
+        } elseif ($value instanceof PersistentResource) {
+            return $value->getFilename();
         } else {
             return '';
         }
