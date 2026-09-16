@@ -2,8 +2,26 @@
 # This makes the form's field names available in the content API node data so the
 # frontend can offer them as placeholders when editing the e-mail body.
 prototype(Networkteam.Neos.ContentApi:BaseNode) {
+  # Field types that carry no user data (the submit button, the captcha). Their
+  # values never reach the mail, so offering them as placeholders would only
+  # produce one that resolves to nothing.
+  #
+  # On the prototype because BaseNode is the only one the content API renders a
+  # node with — there is no per-node-type prototype to hang it off, so this is
+  # read once per node in a response. That is a lookup in the already-loaded
+  # settings array, well below what the package itself does per node
+  # (RecursiveNode puts a FlowQuery in @context).
+  @context.omittedFieldTypes = ${Configuration.setting('Visol.PaperTiger.ZebraAdaptor.fieldTypes.omitted')}
+
   formFields = Neos.Fusion:Map {
-    items = ${q(node).closest('[instanceof Sitegeist.PaperTiger:Form]').find('[instanceof Sitegeist.PaperTiger:Field]').get()}
+    # Same two rules ValidationSchema.fusion applies to the same set of fields: a
+    # field needs a name to be addressable, and an omitted type has no value to
+    # address. Read off `properties` exactly as it does, rather than building a
+    # FlowQuery per field.
+    items = ${Array.filter(
+      q(node).closest('[instanceof Sitegeist.PaperTiger:Form]').find('[instanceof Sitegeist.PaperTiger:Field]').get(),
+      field => field.properties.name && Array.indexOf(omittedFieldTypes, field.nodeType.name) == -1
+    )}
     itemName = 'item'
     itemRenderer = Neos.Fusion:DataStructure {
       identifier = ${item.identifier}
