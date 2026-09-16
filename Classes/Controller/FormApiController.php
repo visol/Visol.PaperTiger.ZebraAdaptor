@@ -309,8 +309,23 @@ class FormApiController extends ActionController
                     $identifier = '__undefined__';
                 }
                 try {
+                    /*
+                     * The same fields the e-mail leaves out of {allFormValues}: a
+                     * field type registered under fieldTypes.omitted submits a value
+                     * but carries no user data, so there is nothing about it worth
+                     * keeping. The captcha is the one that shows — its solution is
+                     * several kilobytes of base64, spent the moment it was verified,
+                     * and it ended up in every row of the DatabaseStorage module and
+                     * every CSV export next to the name and e-mail an editor is
+                     * actually there to read.
+                     */
+                    $properties = $this->getFormValues($formData, $formIdentifier);
+                    foreach ($this->getNonDataFieldNames($formNode) as $nonDataFieldName) {
+                        unset($properties[$nonDataFieldName]);
+                    }
+
                     $dbStorage = new DatabaseStorage();
-                    $dbStorage->setStorageidentifier($identifier)->setProperties($this->getFormValues($formData, $formIdentifier))->setDateTime(new \DateTime());
+                    $dbStorage->setStorageidentifier($identifier)->setProperties($properties)->setDateTime(new \DateTime());
                     $this->databaseStorageRepository->add($dbStorage);
                     $this->formApiLogger->info('DatabaseStorage action executed with identifier: ' . $identifier, ['id' => $submitId]);
                 } catch (\Throwable $e) {
