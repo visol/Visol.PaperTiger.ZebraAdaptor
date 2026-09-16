@@ -4,12 +4,14 @@ namespace Visol\PaperTiger\ZebraAdaptor\Service;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\PersistentResource;
+use Neos\Media\Domain\Model\AssetInterface;
 use Neos\Utility\Arrays;
 use Sitegeist\FusionForm\Upload\Domain\CachedUploadedFile;
 use Sitegeist\Neos\SymfonyMailer\Factories\MailerFactory;
 use Sitegeist\Neos\SymfonyMailer\Factories\MailFactory;
 use Soundasleep\Html2Text;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 
 /**
@@ -123,6 +125,7 @@ class FormService
      * @param array<string, mixed> $additionalData
      * @param array<string, string> $fieldLabelMap Map of field name → display label
      * @param string[] $excludeFieldNames Field names to keep out of {allFormValues}
+     * @param array<mixed> $attachments Assets attached to every mail, whatever the visitor submitted
      */
     public function sendEmail(
         array $formValues,
@@ -138,7 +141,8 @@ class FormService
         ?bool $attachUploads = false,
         ?array $additionalData = [],
         array $fieldLabelMap = [],
-        array $excludeFieldNames = []
+        array $excludeFieldNames = [],
+        array $attachments = []
     ): void {
         // Override recipient and prefix subject if configured (non-production environments)
         if ($this->overrideRecipientAddress !== null && $this->overrideRecipientAddress !== '') {
@@ -179,21 +183,38 @@ class FormService
         );
 
         if ($attachUploads === true) {
-            foreach ($formValues as $fieldIdentifier => $resource) {
-                if (!$resource instanceof PersistentResource) {
-                    continue;
-                }
-                $stream = $resource->getStream();
-                if (is_resource($stream)) {
-                    $content = stream_get_contents($stream);
-                    if ($content !== false) {
-                        $mail->addPart(new DataPart($content, $resource->getFilename(), $resource->getMediaType()));
-                    }
+            foreach ($formValues as $resource) {
+                if ($resource instanceof PersistentResource) {
+                    $this->attachResource($mail, $resource);
                 }
             }
         }
 
+        foreach ($attachments as $asset) {
+            if ($asset instanceof AssetInterface) {
+                $this->attachResource($mail, $asset->getResource());
+            }
+        }
+
         $mailer->send($mail);
+    }
+
+    /**
+     * A resource is a stream, not a file path - an asset may live in a cloud
+     * storage the mailer cannot read from - so the content is read out here and
+     * handed to the mail as a part.
+     */
+    protected function attachResource(Email $mail, PersistentResource $resource): void
+    {
+        $stream = $resource->getStream();
+        if (!is_resource($stream)) {
+            return;
+        }
+        $content = stream_get_contents($stream);
+        if ($content === false) {
+            return;
+        }
+        $mail->addPart(new DataPart($content, $resource->getFilename(), $resource->getMediaType()));
     }
 
     protected function wrapHtml(string $html): string
