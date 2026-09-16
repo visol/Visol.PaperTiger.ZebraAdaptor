@@ -40,5 +40,10 @@
         "neos": {
             "package-key": "Visol.PaperTiger.ZebraAdaptor"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "neos/composer-plugin": true
+        }
     }
 }
