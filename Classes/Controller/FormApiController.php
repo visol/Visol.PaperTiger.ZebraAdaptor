@@ -297,6 +297,12 @@ class FormApiController extends ActionController
             // MESSAGE
             if ($formAction->getNodeType()->getName() === 'Sitegeist.PaperTiger:Action.Message') {
                 $message = $formAction->getProperty('message');
+                // The message is rendered as HTML on the frontend; resolve any
+                // node:// / asset:// links an editor set (relative, like the
+                // Content API does for on-site content).
+                if (is_string($message) && $message !== '') {
+                    $message = $this->resolveNeosUris($message, $formAction, false);
+                }
                 $data['message'] = $message;
                 $this->formApiLogger->info('Message action executed.', ['id' => $submitId]);
             }
@@ -339,6 +345,12 @@ class FormApiController extends ActionController
                 $this->formApiLogger->info('Email action executed.', ['id' => $submitId]);
                 $subject = $formAction->getProperty('subject');
                 $html = $formAction->getProperty('html');
+                // Resolve node:// / asset:// links an editor set in the body into
+                // real URLs. Absolute, because relative links are useless in a
+                // mail the recipient opens outside the site.
+                if (is_string($html) && $html !== '') {
+                    $html = $this->resolveNeosUris($html, $formAction, true);
+                }
                 $recipientAddress = $formAction->getProperty('recipientAddress');
                 $recipientName = $formAction->getProperty('recipientName');
                 $senderAddress = $formAction->getProperty('senderAddress');
@@ -647,6 +659,49 @@ class FormApiController extends ActionController
             }
         }
         return null;
+    }
+
+    /**
+     * Resolve Neos node:// and asset:// URIs embedded in rich-text content (the
+     * e-mail body, the Message action) into real URLs.
+     *
+     * The headless submit path reads these properties directly, so it bypasses
+     * the Content API's URI conversion (Networkteam.Neos.ContentApi's
+     * PropertiesImplementation) that handles every other rich-text property —
+     * which is why the links would otherwise reach the recipient as raw
+     * "asset://<uuid>" / "node://<uuid>" strings. This mirrors that
+     * implementation, reusing the same LinkingService already used for the
+     * Redirect action above.
+     *
+     * @param bool $absolute Resolve node URIs to absolute URLs (required for the
+     *                       e-mail, where relative links do not work).
+     */
+    protected function resolveNeosUris(string $content, NodeInterface $contextNode, bool $absolute): string
+    {
+        $controllerContext = $this->getControllerContext();
+
+        return preg_replace_callback(
+            LinkingService::PATTERN_SUPPORTED_URIS,
+            function (array $matches) use ($contextNode, $controllerContext, $absolute): string {
+                try {
+                    $resolved = match ($matches[1]) {
+                        'node' => $this->linkingService->resolveNodeUri($matches[0], $contextNode, $controllerContext, $absolute),
+                        'asset' => $this->linkingService->resolveAssetUri($matches[0]),
+                        default => null,
+                    };
+                } catch (\Exception $e) {
+                    $this->formApiLogger->warning(
+                        'Could not resolve Neos URI in form content. ' . $e->getMessage(),
+                        ['uri' => $matches[0]]
+                    );
+                    $resolved = null;
+                }
+
+                // Leave an unresolvable URI untouched rather than dropping it.
+                return $resolved ?? $matches[0];
+            },
+            $content
+        ) ?? $content;
     }
 
     /**
