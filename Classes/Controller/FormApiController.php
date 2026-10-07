@@ -683,12 +683,14 @@ class FormApiController extends ActionController
         return preg_replace_callback(
             LinkingService::PATTERN_SUPPORTED_URIS,
             function (array $matches) use ($contextNode, $controllerContext, $absolute): string {
+                // $matches[1] is the scheme from PATTERN_SUPPORTED_URIS and can
+                // only be 'node' or 'asset', so the else branch is the asset case.
                 try {
-                    $resolved = match ($matches[1]) {
-                        'node' => $this->linkingService->resolveNodeUri($matches[0], $contextNode, $controllerContext, $absolute),
-                        'asset' => $this->linkingService->resolveAssetUri($matches[0]),
-                        default => null,
-                    };
+                    if ($matches[1] === 'node') {
+                        $resolved = $this->linkingService->resolveNodeUri($matches[0], $contextNode, $controllerContext, $absolute);
+                    } else {
+                        $resolved = $this->linkingService->resolveAssetUri($matches[0]);
+                    }
                 } catch (\Exception $e) {
                     $this->formApiLogger->warning(
                         'Could not resolve Neos URI in form content. ' . $e->getMessage(),
