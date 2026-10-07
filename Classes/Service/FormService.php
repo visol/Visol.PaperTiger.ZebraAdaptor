@@ -55,7 +55,7 @@ class FormService
                 if ($matches[1] === 'allFormValues') {
                     return $this->getAllFormValuesHtml($data, $fieldLabelMap, $excludeFieldNames);
                 }
-                return htmlspecialchars(strip_tags($this->stringify($value)), ENT_QUOTES);
+                return nl2br(htmlspecialchars(strip_tags($this->stringify($value)), ENT_QUOTES));
             },
             $template
         ) ?? $template;
@@ -90,7 +90,11 @@ class FormService
         $html[] = '<dl>';
         foreach ($stringifiedData as $fieldIdentifier => $value) {
             $label = htmlspecialchars($fieldLabelMap[$fieldIdentifier] ?? $fieldIdentifier, ENT_QUOTES);
-            $html[] = '<dt>' . $label . '</dt><dd>' . $value . '</dd>';
+            // Escape the value, then turn the user's newlines (e.g. from a
+            // textarea) into <br> so they survive into the HTML mail. Html2Text
+            // converts the <br> back to newlines for the plaintext part.
+            $safeValue = nl2br(htmlspecialchars($value, ENT_QUOTES));
+            $html[] = '<dt>' . $label . '</dt><dd>' . $safeValue . '</dd>';
         }
         $html[] = '</dl>';
         return implode(PHP_EOL, $html);
@@ -99,6 +103,16 @@ class FormService
     protected function stringify(mixed $value): string
     {
         if (is_string($value)) {
+            // A Field.Date submits an ISO date string (yyyy-mm-dd). Render it in
+            // the same d.m.Y format as a DateTime value below; leave every other
+            // string untouched. The exact-match re-check rejects impossible dates
+            // (e.g. 2026-13-45) that createFromFormat would silently roll over.
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
+                $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+                if ($date instanceof \DateTimeImmutable && $date->format('Y-m-d') === $value) {
+                    return $date->format('d.m.Y');
+                }
+            }
             return $value;
         } elseif (is_int($value) || is_float($value)) {
             return (string)$value;
