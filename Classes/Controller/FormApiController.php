@@ -3,10 +3,13 @@
 namespace Visol\PaperTiger\ZebraAdaptor\Controller;
 
 use Exception;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\BaseUriProvider;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Mvc\View\JsonView;
 use Neos\Flow\ResourceManagement\ResourceRepository;
@@ -88,6 +91,9 @@ class FormApiController extends ActionController
 
     #[Flow\Inject]
     protected LinkingService $linkingService;
+
+    #[Flow\Inject]
+    protected BaseUriProvider $baseUriProvider;
 
     /**
      * @var string
@@ -690,6 +696,10 @@ class FormApiController extends ActionController
                         $resolved = $this->linkingService->resolveNodeUri($matches[0], $contextNode, $controllerContext, $absolute);
                     } else {
                         $resolved = $this->linkingService->resolveAssetUri($matches[0]);
+                        // A resource target may hand out a site-relative URI.
+                        if ($absolute && $resolved !== null) {
+                            $resolved = $this->makeAbsolute($resolved);
+                        }
                     }
                 } catch (\Exception $e) {
                     $this->formApiLogger->warning(
@@ -704,6 +714,14 @@ class FormApiController extends ActionController
             },
             $content
         ) ?? $content;
+    }
+
+    private function makeAbsolute(string $uri): string
+    {
+        $baseUri = $this->baseUriProvider->getConfiguredBaseUriOrFallbackToCurrentRequest(
+            $this->request->getHttpRequest()
+        );
+        return (string)UriResolver::resolve($baseUri, new Uri($uri));
     }
 
     /**
